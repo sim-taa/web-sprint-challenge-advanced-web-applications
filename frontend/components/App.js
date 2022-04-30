@@ -4,10 +4,12 @@ import Articles from './Articles'
 import LoginForm from './LoginForm'
 import Message from './Message'
 import ArticleForm from './ArticleForm'
-import Spinner from './Spinner'
+import Spinner from './Spinner' /*this is not in the pjt with gabe from web 52, client side auth*/
+import axios from 'axios'
+import { response } from 'msw'
 
-const articlesUrl = 'http://localhost:9000/api/articles'
-const loginUrl = 'http://localhost:9000/api/login'
+export const articlesUrl = 'http://localhost:9000/api/articles'
+export const loginUrl = 'http://localhost:9000/api/login'
 
 export default function App() {
   // ✨ MVP can be achieved with these states
@@ -30,15 +32,31 @@ export default function App() {
   }
 
   const login = ({ username, password }) => {
+    //token will be saved locally
+
     // ✨ implement
     // We should flush the message state, turn on the spinner
     // and launch a request to the proper endpoint.
     // On success, we should set the token to local storage in a 'token' key,
     // put the server success message in its proper state, and redirect
     // to the Articles screen. Don't forget to turn off the spinner!
+    axios.post(loginUrl, { username, password })
+      .then(res => {
+        //store  the token in browswer local storage
+        const token = response.data.token;
+        window.localStorage.setItem('token', token)
+        navigate('/articles')
+
+        //redirect to the articles page
+      })
+      .catch(err => {
+        debugger // to do, render on screen
+      })
   }
 
   const getArticles = () => {
+    //we attach the token from local storage in to the request using the authorization header
+
     // ✨ implement
     // We should flush the message state, turn on the spinner
     // and launch an authenticated request to the proper endpoint.
@@ -50,6 +68,8 @@ export default function App() {
   }
 
   const postArticle = article => {
+  //we attach an authorization header containing the token from local storage in to the request using the authorization header
+
     // ✨ implement
     // The flow is very similar to the `getArticles` function.
     // You'll know what to do! Use log statements or breakpoints
