@@ -35,12 +35,11 @@ export default function App() {
     axios.post(loginUrl, { username, password })
       .then((res) => {
         const token = response.data.token;
-        window.localStorage.setItem('token', res.data.token)
+        window.localStorage.setItem('token', token)
         setMessage(res.data.message)
         redirectToArticles()
       })
       .catch(err => {
-      // to do, render on screen (√)
         setMessage(err.response.data.message)
       .finally(() => {
           setSpinnerOn(false)
@@ -49,42 +48,84 @@ export default function App() {
   }
 
   const getArticles = () => {
-    redirectToLogin()
-    //we attach the token from local storage in to the request using the authorization header
-
-    // ✨ implement
-    // We should flush the message state, turn on the spinner
-    // and launch an authenticated request to the proper endpoint.
-    // On success, we should set the articles in their proper state and
-    // put the server success message in its proper state.
-    // If something goes wrong, check the status of the response:
-    // if it's a 401 the token might have gone bad, and we should redirect to login.(√)
-    // Don't forget to turn off the spinner!
+    //redirectToLogin()
+    setMessage('');
+    setSpinnerOn(true)
+    axiosWithAuth()
+        .get(articlesUrl)
+        .then((res) => {
+            setArticles(res.data.articles)
+            setMessage(res.data.message)
+        })
+        .catch((err) => {
+            if (err.resp.status === 401) {
+                redirectToLogin()
+            } else {
+                setMessage(err.res.data.message)
+            }
+        })
+        .finally(() => {
+            setSpinnerOn(false);
+        });
   }
 
   const postArticle = article => {
-  //we attach an authorization header containing the token from local storage in to the request using the authorization header
-
-    // ✨ implement
-    // The flow is very similar to the `getArticles` function.
-    // You'll know what to do! Use log statements or breakpoints
-    // to inspect the response from the server.
+    axiosWithAuth()
+    .post(articlesUrl, article)
+    .then((res) => {
+        setArticles([...articles, res.data.article])
+        setMessage(res.data.message)
+    })
+    .catch((err) => {
+        setMessage(err.response.data.message)
+    });
   }
 
   const updateArticle = ({ article_id, article }) => {
-    // ✨ implement
-    // You got this!
+    setSpinnerOn(true);
+    axiosWithAuth()
+        .put(`${articlesUrl}/${article_id}`, {
+            title: article.title,
+            text: article.text,
+            topic: article.topic,
+        })
+        .then((res) => {
+            setArticles(
+                articles.map((art) => {
+                    return art.article_id === article_id ? res.data.article : art
+                })
+            );
+            setMessage(res.data.message)
+            setCurrentArticleId()
+        })
+        .catch((err) => {
+            setMessage(err?.response?.data?.message)
+        })
+        .finally(() => setSpinnerOn(false))
   }
 
   const deleteArticle = article_id => {
-    // ✨ implement
+    setSpinnerOn(true)
+    axiosWithAuth().delete(`${articlesUrl}/${article_id}`)
+      .then(res => {
+        setMessage(res.data.message)
+        setArticles(articles.filter(art => {
+          return art.article_id !== article_id
+        }))
+      })
+      .catch(err => {
+        setMessage(err?.response?.data?.message)
+      })
+      .finally(() => {
+        setSpinnerOn(false)
+      })
   }
 
   return (
     // ✨ fix the JSX: `Spinner`, `Message`, `LoginForm`, `ArticleForm` and `Articles` expect props ❗
     <React.StrictMode>
-      <Spinner />
-      <Message />
+      <Spinner on = {spinnerOn}/>
+      <Message message = {message}/>
       <button id="logout" onClick={logout}>Logout from app</button>
       <div id="wrapper" style={{ opacity: spinnerOn ? "0.25" : "1" }}> {/* <-- do not change this line */}
         <h1>Advanced Web Applications</h1>
@@ -93,11 +134,23 @@ export default function App() {
           <NavLink id="articlesScreen" to="/articles">Articles</NavLink>
         </nav>
         <Routes>
-          <Route path="/" element={<LoginForm />} />
+          <Route path="/" element={<LoginForm login={login} />} />
           <Route path="articles" element={
             <>
-              <ArticleForm />
-              <Articles />
+              <ArticleForm
+                   article={articles.find((art) => {
+                     return art.article_id === currentArticleId;
+                   })}
+                   postArticle={postArticle}
+                   setCurrentArticleId={setCurrentArticleId}
+                   updateArticle={updateArticle}
+               />
+               <Articles
+                   getArticles={getArticles}
+                   articles={articles}
+                   deleteArticle={deleteArticle}
+                   setCurrentArticleId={setCurrentArticleId}
+               />
             </>
           } />
         </Routes>
