@@ -6,7 +6,7 @@ import Message from './Message'
 import ArticleForm from './ArticleForm'
 import Spinner from './Spinner' /*this is not in the pjt with gabe from web 52, client side auth*/
 import axios from 'axios'
-import axiosWithAuth from '../axios/index'
+import axiosWithAuth from '../axios'
 import { response } from 'msw'
 
 export const articlesUrl = 'http://localhost:9000/api/articles'
@@ -46,11 +46,10 @@ export default function App() {
   }
 
   const getArticles = () => {
-    redirectToLogin()
+    //redirectToLogin()
     setMessage('');
-    setSpinnerOn(true)
-    axiosWithAuth()
-        .get(articlesUrl)
+    // setSpinnerOn(true)
+    axiosWithAuth().get(articlesUrl)
         .then((res) => {
             setArticles(res.data.articles)
             setMessage(res.data.message)
