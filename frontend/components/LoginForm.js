@@ -1,11 +1,18 @@
 import React, { useState } from 'react'
 import PT from 'prop-types'
+import { NavLink, Routes, Route, useNavigate } from 'react-router-dom'
+
+
 
 const initialFormValues = {
   username: '',
   password: '',
 }
 export default function LoginForm(props) {
+  const navigate = useNavigate()
+  const redirectToLogin = () => { navigate('/') }
+  const redirectToArticles = () => { navigate('/articles') }
+
   const [values, setValues] = useState(initialFormValues)
   const { login } = props;
   console.log(props);

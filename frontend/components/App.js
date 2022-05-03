@@ -31,8 +31,7 @@ export default function App() {
     const login = ({ username, password }) => {
       setMessage('');
         setSpinnerOn(true);
-        axios
-            .post(loginUrl, { username, password })
+        axios.post(loginUrl, { username, password })
             .then((res) => {
                 window.localStorage.setItem('token', res.data.token);
                 setMessage(res.data.message);
@@ -47,9 +46,9 @@ export default function App() {
   }
 
   const getArticles = () => {
-    //redirectToLogin()
+    redirectToLogin()
     setMessage('');
-    //setSpinnerOn(true)
+    setSpinnerOn(true)
     axiosWithAuth()
         .get(articlesUrl)
         .then((res) => {
@@ -81,7 +80,7 @@ export default function App() {
   }
 
   const updateArticle = ({ article_id, article }) => {
-    //setSpinnerOn(true);
+    setSpinnerOn(true);
     axiosWithAuth()
         .put(`${articlesUrl}/${article_id}`, {
             title: article.title,
@@ -104,7 +103,7 @@ export default function App() {
   }
 
   const deleteArticle = article_id => {
-    //setSpinnerOn(true)
+    setSpinnerOn(true)
     axiosWithAuth().delete(`${articlesUrl}/${article_id}`)
       .then(res => {
         setMessage(res.data.message)
@@ -121,7 +120,6 @@ export default function App() {
   }
 
   return (
-    // ✨ fix the JSX: `Spinner`, `Message`, `LoginForm`, `ArticleForm` and `Articles` expect props ❗
     <React.StrictMode>
       <Spinner on = {spinnerOn}/>
       <Message message = {message}/>
