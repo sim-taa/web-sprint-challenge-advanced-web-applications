@@ -6,19 +6,18 @@ import Message from './Message'
 import ArticleForm from './ArticleForm'
 import Spinner from './Spinner' /*this is not in the pjt with gabe from web 52, client side auth*/
 import axios from 'axios'
+import axiosWithAuth from '../axios/index'
 import { response } from 'msw'
 
 export const articlesUrl = 'http://localhost:9000/api/articles'
 export const loginUrl = 'http://localhost:9000/api/login'
 
 export default function App() {
-  // ✨ MVP can be achieved with these states
   const [message, setMessage] = useState('')
   const [articles, setArticles] = useState([])
   const [currentArticleId, setCurrentArticleId] = useState()
   const [spinnerOn, setSpinnerOn] = useState(false)
 
-  // ✨ Research `useNavigate` in React Router v.6
   const navigate = useNavigate()
   const redirectToLogin = () => { navigate('/') }
   const redirectToArticles = () => { navigate('/articles') }
@@ -29,28 +28,28 @@ export default function App() {
       redirectToLogin()
   }
 
-  const login = ({ username, password }) => {
-    setMessage('')
-    setSpinnerOn(true)
-    axios.post(loginUrl, { username, password })
-      .then((res) => {
-        const token = response.data.token;
-        window.localStorage.setItem('token', token)
-        setMessage(res.data.message)
-        redirectToArticles()
-      })
-      .catch(err => {
-        setMessage(err.response.data.message)
-      .finally(() => {
-          setSpinnerOn(false)
-      })
-      })
+    const login = ({ username, password }) => {
+      setMessage('');
+        setSpinnerOn(true);
+        axios
+            .post(loginUrl, { username, password })
+            .then((res) => {
+                window.localStorage.setItem('token', res.data.token);
+                setMessage(res.data.message);
+                redirectToArticles();
+            })
+            .catch((err) => {
+                setMessage(err.response.data.message);
+            })
+            .finally(() => {
+                setSpinnerOn(false);
+            });
   }
 
   const getArticles = () => {
     //redirectToLogin()
     setMessage('');
-    setSpinnerOn(true)
+    //setSpinnerOn(true)
     axiosWithAuth()
         .get(articlesUrl)
         .then((res) => {
@@ -82,7 +81,7 @@ export default function App() {
   }
 
   const updateArticle = ({ article_id, article }) => {
-    setSpinnerOn(true);
+    //setSpinnerOn(true);
     axiosWithAuth()
         .put(`${articlesUrl}/${article_id}`, {
             title: article.title,
@@ -105,7 +104,7 @@ export default function App() {
   }
 
   const deleteArticle = article_id => {
-    setSpinnerOn(true)
+    //setSpinnerOn(true)
     axiosWithAuth().delete(`${articlesUrl}/${article_id}`)
       .then(res => {
         setMessage(res.data.message)
