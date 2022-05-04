@@ -105,7 +105,7 @@ export default function App() {
     setSpinnerOn(true)
     axiosWithAuth().delete(`${articlesUrl}/${article_id}`)
       .then(res => {
-        setMessage("foo  bar")
+        setMessage(res.data.message)
         setArticles(articles.filter(art => {
           return art.article_id !== article_id
         }))
