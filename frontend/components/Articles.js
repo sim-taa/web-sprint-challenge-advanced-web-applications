@@ -8,7 +8,7 @@ export default function Articles(props) {
     articles,
     getArticles,
     deleteArticle,
-    updateArticle,
+    setCurrentArticleId,
     fetching,
   } = props
 
@@ -18,7 +18,7 @@ export default function Articles(props) {
   useEffect(() => {
     // ✨ grab the articles here, on first render only
     getArticles()
-  })
+  },[])
 
  // if (!window.localStorage.getItem('token')) {
  //   return redirectToLogin()
@@ -41,8 +41,8 @@ export default function Articles(props) {
                   <p>Topic: {art.topic}</p>
                 </div>
                 <div>
-                  {/* <button disabled={true} onClick={updateArticle(art.article_id)}>Edit</button>
-                  <button disabled={true} onClick={deleteArticle(art.article_id)}>Delete</button> */}
+                  <button disabled={false} onClick={() => setCurrentArticleId(art.article_id)}>Edit</button>
+                  <button disabled={false} onClick={() => deleteArticle(art.article_id)}>Delete</button>
                 </div>
               </div>
             )
